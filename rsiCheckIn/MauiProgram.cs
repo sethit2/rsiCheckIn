@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using ZXing.Net.Maui.Controls;
+using BarcodeScanning;
 
 namespace rsiCheckIn
 {
@@ -8,14 +8,14 @@ namespace rsiCheckIn
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                })
-                .UseBarcodeReader();
+			builder
+				.UseMauiApp<App>()
+				.ConfigureFonts(fonts =>
+				{
+					fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+					fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+				})
+				.UseBarcodeScanning();
 
 #if DEBUG
     		builder.Logging.AddDebug();
