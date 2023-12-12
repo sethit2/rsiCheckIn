@@ -43,15 +43,39 @@ namespace rsiCheckIn
 			Barcode.CameraEnabled = false;
 		}
 
-		Task popup = Task.CompletedTask;
+		bool screenWait = false;
+		object lockObj = new object();
 		private async void Barcode_OnDetectionFinished(object sender, OnDetectionFinishedEventArg e)
 		{
-			if (popup.IsCompleted)
-				foreach (var (guid, name) in e.BarcodeResults.Select(parseQR).Where(x => x.HasValue).Select(x => x.Value))
+			if (screenWait)
+				return;
+			lock (lockObj)
+			{
+				if (screenWait)
+					return;
+				screenWait = true;
+			}
+
+			List<Guid> guids = new List<Guid>();
+
+			foreach (var (guid, name) in e.BarcodeResults.Select(parseQR).Where(x => x.HasValue).Select(x => x.Value))
+			{
+				var popup = await DisplayAlert("Checking in", $"Sign in: {name}", "Yes", "No");
+				if (popup)
 				{
-					popup = DisplayAlert("Checking in", $"Sign in: {name}", "Yes", "No");
-					await popup;
+					guids.Add(guid);
 				}
+			}
+
+			lock (lockObj)
+			{
+				screenWait = false;
+			}
+
+			if (guids.Count > 0)
+			{
+				await SpreadsheetInteraction.SpreadsheetConnector.SigninPlayers(guids);
+			}
 		}
 	}
 }
