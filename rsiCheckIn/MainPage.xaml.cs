@@ -6,10 +6,6 @@ namespace rsiCheckIn
 {
 	public partial class MainPage : ContentPage
 	{
-		HashSet<Guid> guids = [
-			Guid.Parse("f7cdf6e5-90a2-443d-971e-2725ebede9ec")
-		];
-
 		public MainPage()
 		{
 			InitializeComponent();
@@ -23,8 +19,6 @@ namespace rsiCheckIn
 			if (text.Length == split + 1)
 				return null;
 			if (!Guid.TryParse(text.AsSpan(0, split), out Guid guid))
-				return null;
-			if (!guids.Contains(guid))
 				return null;
 			return (guid, text.Substring(split + 1));
 		}
