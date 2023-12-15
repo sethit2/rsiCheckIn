@@ -5,15 +5,34 @@ using System.Linq;
 using CommunityToolkit.Maui.Alerts;
 using System.Text.Json;
 using CommunityToolkit.Maui.Core;
+using rsiCheckIn.SpreadsheetInteraction;
 
 namespace rsiCheckIn
 {
 	public partial class MainPage : ContentPage
 	{
+		//readonly object playersLock = new();
+		//Dictionary<Guid, SpreadsheetConnector.Player> players;
+
 		public MainPage()
 		{
 			InitializeComponent();
+			//UpdatePlayerInfo();
+			//Dispatcher.StartTimer(TimeSpan.FromSeconds(30), () =>
+			//{
+			//	UpdatePlayerInfo();
+			//	return true;
+			//});
 		}
+
+		async void UpdatePlayerInfo()
+		{
+			var p = await SpreadsheetConnector.Players();
+			var p1 = p.ToDictionary(x => x.Id);
+			lock (playersLock)
+				players = p1;
+		}
+
 		public Guid ParseQR(BarcodeResult result)
 		{
 			if (Guid.TryParse(result.DisplayValue, out Guid guid))
@@ -29,8 +48,6 @@ namespace rsiCheckIn
 			base.OnAppearing();
 
 			Barcode.CameraEnabled = true;
-
-			await Snackbar.Make("Hello world!", duration: TimeSpan.FromSeconds(3), anchor: Barcode).Show();
 		}
 
 		protected override void OnDisappearing()
@@ -39,6 +56,10 @@ namespace rsiCheckIn
 			Barcode.CameraEnabled = false;
 		}
 
+		static readonly SnackbarOptions snackbarOptions = new()
+		{
+			BackgroundColor = new Color(0x5c, 0x85, 0x5c),
+		};
 		bool screenWait = false;
 		readonly object lockObj = new();
 		private async void Barcode_OnDetectionFinished(object sender, OnDetectionFinishedEventArg e)
@@ -52,15 +73,14 @@ namespace rsiCheckIn
 				screenWait = true;
 			}
 
-			//List<Guid> guids = e.BarcodeResults.Select(ParseQR).Where(x => x != Guid.Empty).ToList();
-			var snackbarOptions = new SnackbarOptions
-			{
-				BackgroundColor = new Color(0x5c, 0x85, 0x5c),
-			};
-			if (e.BarcodeResults.Count > 0)
+			//var guids = e.BarcodeResults.Select(ParseQR).Where(x => x != Guid.Empty).Where(x => players.ContainsKey(x)).Select(x => players[x]).Where(x => !x.SignedIn);
+
+			var guids = e.BarcodeResults.Select(ParseQR).Where(x => x != Guid.Empty);
+
+			if (guids.Any())
 			{
 				Vibration.Vibrate();
-				await Snackbar.Make(JsonSerializer.Serialize(e.BarcodeResults.Select(x => x.DisplayValue)), duration: TimeSpan.FromSeconds(3), visualOptions: snackbarOptions).Show();
+				SpreadsheetConnector.SigninPlayers(guids);
 			}
 
 			lock (lockObj)
