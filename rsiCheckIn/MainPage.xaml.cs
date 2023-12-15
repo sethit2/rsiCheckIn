@@ -25,13 +25,13 @@ namespace rsiCheckIn
 			//});
 		}
 
-		async void UpdatePlayerInfo()
-		{
-			var p = await SpreadsheetConnector.Players();
-			var p1 = p.ToDictionary(x => x.Id);
-			lock (playersLock)
-				players = p1;
-		}
+		//async void UpdatePlayerInfo()
+		//{
+		//	var p = await SpreadsheetConnector.Players();
+		//	var p1 = p.ToDictionary(x => x.Id);
+		//	lock (playersLock)
+		//		players = p1;
+		//}
 
 		public Guid ParseQR(BarcodeResult result)
 		{
@@ -80,7 +80,6 @@ namespace rsiCheckIn
 			if (guids.Any())
 			{
 				Vibration.Vibrate();
-				SpreadsheetConnector.SigninPlayers(guids);
 			}
 
 			lock (lockObj)
@@ -88,10 +87,10 @@ namespace rsiCheckIn
 				screenWait = false;
 			}
 
-			//if (guids.Count > 0)
-			//{
-			//	await SpreadsheetInteraction.SpreadsheetConnector.SigninPlayers(guids);
-			//}
+			if (guids.Any())
+			{
+				await SpreadsheetConnector.SigninPlayers(guids);
+			}
 		}
 	}
 }
