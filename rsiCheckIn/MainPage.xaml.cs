@@ -24,10 +24,13 @@ namespace rsiCheckIn
 
 		protected override async void OnAppearing()
 		{
+
 			await Methods.AskForRequiredPermissionAsync();
 			base.OnAppearing();
 
 			Barcode.CameraEnabled = true;
+
+			await Snackbar.Make("Hello world!", duration: TimeSpan.FromSeconds(3), anchor: Barcode).Show();
 		}
 
 		protected override void OnDisappearing()
