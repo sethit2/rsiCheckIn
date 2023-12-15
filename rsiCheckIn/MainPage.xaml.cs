@@ -1,6 +1,10 @@
 ﻿using BarcodeScanning;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
+using CommunityToolkit.Maui.Alerts;
+using System.Text.Json;
+using CommunityToolkit.Maui.Core;
 
 namespace rsiCheckIn
 {
@@ -10,17 +14,12 @@ namespace rsiCheckIn
 		{
 			InitializeComponent();
 		}
-		public (Guid guid, string name)? parseQR(BarcodeResult result)
+		public Guid ParseQR(BarcodeResult result)
 		{
-			string text = result.DisplayValue;
-			var split = text.IndexOf('\n');
-			if (split == -1)
-				return null;
-			if (text.Length == split + 1)
-				return null;
-			if (!Guid.TryParse(text.AsSpan(0, split), out Guid guid))
-				return null;
-			return (guid, text.Substring(split + 1));
+			if (Guid.TryParse(result.DisplayValue, out Guid guid))
+				return guid;
+			else
+				return Guid.Empty;
 		}
 
 		protected override async void OnAppearing()
@@ -38,7 +37,7 @@ namespace rsiCheckIn
 		}
 
 		bool screenWait = false;
-		object lockObj = new object();
+		readonly object lockObj = new();
 		private async void Barcode_OnDetectionFinished(object sender, OnDetectionFinishedEventArg e)
 		{
 			if (screenWait)
@@ -50,15 +49,15 @@ namespace rsiCheckIn
 				screenWait = true;
 			}
 
-			List<Guid> guids = new List<Guid>();
-
-			foreach (var (guid, name) in e.BarcodeResults.Select(parseQR).Where(x => x.HasValue).Select(x => x.Value))
+			//List<Guid> guids = e.BarcodeResults.Select(ParseQR).Where(x => x != Guid.Empty).ToList();
+			var snackbarOptions = new SnackbarOptions
 			{
-				var popup = await DisplayAlert("Checking in", $"Sign in: {name}", "Yes", "No");
-				if (popup)
-				{
-					guids.Add(guid);
-				}
+				BackgroundColor = new Color(0x5c, 0x85, 0x5c),
+			};
+			if (e.BarcodeResults.Count > 0)
+			{
+				Vibration.Vibrate();
+				await Snackbar.Make(JsonSerializer.Serialize(e.BarcodeResults.Select(x => x.DisplayValue)), duration: TimeSpan.FromSeconds(3), visualOptions: snackbarOptions).Show();
 			}
 
 			lock (lockObj)
@@ -66,10 +65,10 @@ namespace rsiCheckIn
 				screenWait = false;
 			}
 
-			if (guids.Count > 0)
-			{
-				await SpreadsheetInteraction.SpreadsheetConnector.SigninPlayers(guids);
-			}
+			//if (guids.Count > 0)
+			//{
+			//	await SpreadsheetInteraction.SpreadsheetConnector.SigninPlayers(guids);
+			//}
 		}
 	}
 }

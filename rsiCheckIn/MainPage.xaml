@@ -14,6 +14,10 @@
                             BarcodeSymbologies="All"
                             x:Name="Barcode">
 		</scanner:CameraView>
+		<StackLayout x:Name="anchorForSnackbar"
+					 AbsoluteLayout.LayoutFlags="All"
+					 AbsoluteLayout.LayoutBounds="10,10,1,1">
+		</StackLayout>
 	</AbsoluteLayout>
 
 
