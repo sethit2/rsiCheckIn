@@ -62,6 +62,7 @@ namespace rsiCheckIn
 		};
 		bool screenWait = false;
 		readonly object lockObj = new();
+		readonly HashSet<Guid> signedIn = new();
 		private async void Barcode_OnDetectionFinished(object sender, OnDetectionFinishedEventArg e)
 		{
 			if (screenWait)
@@ -75,10 +76,12 @@ namespace rsiCheckIn
 
 			//var guids = e.BarcodeResults.Select(ParseQR).Where(x => x != Guid.Empty).Where(x => players.ContainsKey(x)).Select(x => players[x]).Where(x => !x.SignedIn);
 
-			var guids = e.BarcodeResults.Select(ParseQR).Where(x => x != Guid.Empty);
+			var guids = e.BarcodeResults.Select(ParseQR).Where(x => x != Guid.Empty).Where(x => !signedIn.Contains(x)).ToList();
 
 			if (guids.Any())
 			{
+				signedIn.UnionWith(guids);
+				await Snackbar.Make("Signing in...", duration: TimeSpan.FromSeconds(.5), anchor: anchorForSnackbar, visualOptions: snackbarOptions).Show();
 				Vibration.Vibrate();
 			}
 
