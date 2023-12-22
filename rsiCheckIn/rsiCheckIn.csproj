@@ -22,10 +22,10 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>rsiCheckIn</ApplicationTitle>
+		<ApplicationTitle>rsiCheckOut</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.rsicheckin</ApplicationId>
+		<ApplicationId>com.companyname.rsicheckout</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
