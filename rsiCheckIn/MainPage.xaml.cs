@@ -5,7 +5,7 @@ using System.Linq;
 using CommunityToolkit.Maui.Alerts;
 using System.Text.Json;
 using CommunityToolkit.Maui.Core;
-using rsiCheckIn.SpreadsheetInteraction;
+using RsiApiWrapper;
 
 namespace rsiCheckIn
 {
@@ -92,7 +92,7 @@ namespace rsiCheckIn
 
 			if (guids.Any())
 			{
-				await SpreadsheetConnector.SigninPlayers(guids);
+				await SpreadsheetConnector.CheckinPlayers(guids);
 			}
 		}
 	}
