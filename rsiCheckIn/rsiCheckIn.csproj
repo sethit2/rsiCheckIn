@@ -76,4 +76,8 @@
 	  </PackageReference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\RsiApiWrapper\RsiApiWrapper.csproj" />
+	</ItemGroup>
+
 </Project>

@@ -5,7 +5,7 @@ using System.Linq;
 using CommunityToolkit.Maui.Alerts;
 using System.Text.Json;
 using CommunityToolkit.Maui.Core;
-using rsiCheckIn.SpreadsheetInteraction;
+using RsiApiWrapper;
 
 namespace rsiCheckIn
 {
@@ -81,7 +81,7 @@ namespace rsiCheckIn
 			if (guids.Any())
 			{
 				signedIn.UnionWith(guids);
-				await Snackbar.Make("Signing in...", duration: TimeSpan.FromSeconds(.5), anchor: anchorForSnackbar, visualOptions: snackbarOptions).Show();
+				await Snackbar.Make("Signing out...", duration: TimeSpan.FromSeconds(.5), anchor: anchorForSnackbar, visualOptions: snackbarOptions).Show();
 				Vibration.Vibrate();
 			}
 
@@ -92,7 +92,7 @@ namespace rsiCheckIn
 
 			if (guids.Any())
 			{
-				await SpreadsheetConnector.SigninPlayers(guids);
+				await SpreadsheetConnector.CheckoutPlayers(guids);
 			}
 		}
 	}
