@@ -81,7 +81,7 @@ namespace rsiCheckIn
 			if (guids.Any())
 			{
 				signedIn.UnionWith(guids);
-				await Snackbar.Make("Signing out...", duration: TimeSpan.FromSeconds(.5), anchor: anchorForSnackbar, visualOptions: snackbarOptions).Show();
+				await Snackbar.Make("Signing out...", duration: TimeSpan.FromSeconds(.25), anchor: anchorForSnackbar, visualOptions: snackbarOptions).Show();
 				Vibration.Vibrate();
 			}
 
