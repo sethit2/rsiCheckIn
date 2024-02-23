@@ -23,13 +23,21 @@ namespace RsiApiWrapper
 		//	return JsonSerializer.Deserialize<Player[]>(payload);
 		//}
 
-		private const string URL = "https://script.google.com/macros/s/AKfycbyGCn4r_ObZO0f_UoaGSa6slm8lH8dz2RJTn9bOIo-QaXNjOfWDgebV5JghQ9eyiELd/exec";
+		private static readonly Task<string> URL = Task.Run(async () =>
+		{
+			const string initialUrl = "https://script.google.com/macros/s/AKfycbwa1hEkYXy39lG19kKrbB0U71eGElE5159VAftN9fbi4tnPznivlAb_hzoJmy4NPnS_ww/exec";
+			using var httpClient = new HttpClient();
+			var response = await httpClient.GetAsync(initialUrl);
+			var output = await response.Content.ReadAsStringAsync();
+			return output;
+		});
+		
 
 		public static async Task<bool> CheckinPlayers(IEnumerable<Guid> ids)
 		{
 			var payload = JsonSerializer.Serialize(ids);
 			using var httpClient = new HttpClient();
-			const string url = URL + "?endpoint=checkin";
+			string url = await URL + "?endpoint=checkin";
 			var response = await httpClient.PostAsync(url, new StringContent(payload, Encoding.UTF8, "application/json"));
 			return response.StatusCode == System.Net.HttpStatusCode.OK
 				&& (await response.Content.ReadAsStringAsync()) == "1";
@@ -39,7 +47,7 @@ namespace RsiApiWrapper
 		{
 			var payload = JsonSerializer.Serialize(ids);
 			using var httpClient = new HttpClient();
-			const string url = URL + "?endpoint=checkout";
+			string url = await URL + "?endpoint=checkout";
 			var response = await httpClient.PostAsync(url, new StringContent(payload, Encoding.UTF8, "application/json"));
 			return response.StatusCode == System.Net.HttpStatusCode.OK
 				&& (await response.Content.ReadAsStringAsync()) == "1";
