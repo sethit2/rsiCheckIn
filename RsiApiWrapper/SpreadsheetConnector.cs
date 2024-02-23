@@ -25,10 +25,11 @@ namespace RsiApiWrapper
 
 		private static readonly Task<string> URL = Task.Run(async () =>
 		{
-			const string initialUrl = "https://script.google.com/macros/s/AKfycbyGCn4r_ObZO0f_UoaGSa6slm8lH8dz2RJTn9bOIo-QaXNjOfWDgebV5JghQ9eyiELd/exec";
+			const string initialUrl = "https://script.google.com/macros/s/AKfycbwa1hEkYXy39lG19kKrbB0U71eGElE5159VAftN9fbi4tnPznivlAb_hzoJmy4NPnS_ww/exec";
 			using var httpClient = new HttpClient();
 			var response = await httpClient.GetAsync(initialUrl);
-			return await response.Content.ReadAsStringAsync();
+			var output = await response.Content.ReadAsStringAsync();
+			return output;
 		});
 		
 
